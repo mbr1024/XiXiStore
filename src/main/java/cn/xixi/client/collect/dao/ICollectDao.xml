@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xixi.client.collect.dao.ICollectDao">
+    <insert id="insertCollect">
+        insert into assess (aid,content,uid,pid) values (#{aid},#{content},#{user.uid},#{product.pid});
+    </insert>
+    <select id="selectProductById" resultType="Product">
+        SELECT * FROM product where pid=#{pid}
+    </select>
+    <resultMap id="selectCollectByIdMap" type="Assess">
+        <association property="product" column="pid" select="selectProductById">
+        </association>
+    </resultMap>
+    <select id="selectCollectById" resultMap="selectCollectByIdMap">
+        select * from assess
+        where uid=#{uid}
+    </select>
+</mapper>

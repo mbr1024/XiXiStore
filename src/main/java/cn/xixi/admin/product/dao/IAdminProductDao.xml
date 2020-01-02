@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xixi.admin.product.dao.IAdminProductDao">
+    <select id="selectProductCategory" resultType="Category">
+        select * from category
+    </select>
+    <select id="insertProduct">
+        insert into product
+         (pid,pname,pimage,price,succ_count,pdesc,is_hot,pnumber,pdate,cid)
+        values
+        (#{pid},#{pname},#{pimage},#{price},#{succ_count},#{pdesc},#{is_hot},#{pnumber},#{pdate},#{category.cid})
+    </select>
+    <select id="selectCategory" resultType="Category">
+        select * from category where cid=#{cid}
+    </select>
+    <resultMap id="selectProductMap" type="Product">
+        <id property="pid" column="pid"/>
+        <association property="category" column="cid" select="selectCategory"/>
+    </resultMap>
+    <select id="selectProduct" resultMap="selectProductMap">
+        select * from product
+        limit 30
+    </select>
+    <delete id="deleteProductById">
+        delete from product
+        where pid=#{params}
+    </delete>
+    <update id="update">
+        update product
+        set pname=#{pname},price=#{price},pnumber=#{pnumber},is_hot=#{is_hot},pimage=#{pimage}
+        where pid=#{pid}
+    </update>
+    <update id="updateProductByflag">
+        update product set pflag =#{i}  where pid=#{params};
+    </update>
+</mapper>

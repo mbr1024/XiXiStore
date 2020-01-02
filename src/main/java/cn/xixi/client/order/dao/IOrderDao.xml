@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xixi.client.order.dao.IOrderDao">
+    <select id="selectUserByAddress" resultType="User">
+        select * from user where uid=#{user_id}
+    </select>
+    <resultMap id="selectAddressByUserMap" type="Address">
+        <id column="did" property="did"/>
+        <association property="user" column="user_id" select="selectUserByAddress"/>
+    </resultMap>
+    <select id="selectAddressByUser" resultMap="selectAddressByUserMap">
+        select * from address
+        where user_id=#{uid}
+    </select>
+    <resultMap id="selectAddressByIdMap" type="Address">
+        <id column="did" property="did"/>
+        <association property="user" column="user_id" select="selectUserByAddress"/>
+    </resultMap>
+    <select id="selectAddressById" resultMap="selectAddressByIdMap">
+        select * from address where did=#{did}
+    </select>
+    <insert id="insertOrder">
+        insert into  orders(order_id,total,state,address,name,telephone,uid)
+        values (#{order_id},#{total},#{state},#{address},#{name},#{telephone},#{user.uid})
+    </insert>
+    <insert id="insertOrderItem">
+        insert into orderItem (item_id,count,subtotal,pid,order_id) values (#{item_id},#{count},#{subtotal},#{product.pid},#{order_id});
+        
+    </insert>
+    <update id="changeProductNum">
+        update product set pnumber =pnumber-#{count}  where pid=#{product.pid}
+    </update>
+    <select id="selectUserById" resultType="User">
+        select * from User
+        where uid=#{uid}
+    </select>
+    <select id="selectProductById" resultType="Product">
+        SELECT * FROM product where pid=#{pid}
+    </select>
+    <resultMap id="selectOrderItemByOrderIdMap" type="Orderitem">
+        <id property="item_id" column="item_id"/>
+        <association property="product" column="pid" select="selectProductById"/>
+    </resultMap>
+    <select id="selectOrderItemByOrderId" resultMap="selectOrderItemByOrderIdMap">
+        select * from orderitem where order_id=#{order_id}
+    </select>
+    <resultMap id="selectOrderByOrderIdMap" type="Order">
+        <id column="order_id" property="order_id"/>
+        <association property="user" column="uid" select="selectUserById"/>
+        <collection property="orderitems" column="order_id" select="selectOrderItemByOrderId">
+            <id column="item_id" property="item_id"/>
+        </collection>
+    </resultMap>
+    <select id="selectOrderByOrderId" resultMap="selectOrderByOrderIdMap">
+        select * from orders
+        where order_id=#{out_trade_no}
+    </select>
+    <update id="modifyOrderStatus">
+        update Orders set state=1
+        where order_id=#{out_trade_no}
+    </update>
+
+    <select id="selectOrderByUserId" resultMap="selectOrderByOrderIdMap">
+        select * from orders where uid=#{uid}
+    </select>
+    <update id="changeProductSuccCount">
+        update product set succ_count =succ_count+#{count}  where pid=#{product.pid};
+    </update>
+</mapper>
